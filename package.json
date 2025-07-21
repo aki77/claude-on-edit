@@ -1,0 +1,47 @@
+{
+  "name": "@aki77/claude-on-edit",
+  "version": "0.1.0",
+  "description": "Run commands on files when Claude Code edits them",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "format",
+    "lint",
+    "hook",
+    "posttooluse"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "claude-on-edit": "dist/cli.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepare": "npm run build",
+    "lint": "biome check src/",
+    "format": "biome format --write src/"
+  },
+  "dependencies": {
+    "minimatch": "^9.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.1.2",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aki77/claude-on-edit.git"
+  },
+  "author": "aki77",
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531"
+}
