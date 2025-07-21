@@ -1,6 +1,6 @@
 import { minimatch } from 'minimatch';
 import { CommandRunner } from './commandRunner.js';
-import type { ClaudeOnEditOptions, Config, ProcessingTask, ProcessingError } from './types.js';
+import type { ClaudeOnEditOptions, Config, ProcessingError, ProcessingTask } from './types.js';
 
 export class FileProcessor {
   private commandRunner: CommandRunner;
@@ -76,9 +76,12 @@ export class FileProcessor {
     throw new Error(`Invalid command configuration: ${typeof commands}`);
   }
 
-  private async runSequential(tasks: ProcessingTask[], workingDir: string): Promise<ProcessingError[]> {
+  private async runSequential(
+    tasks: ProcessingTask[],
+    workingDir: string,
+  ): Promise<ProcessingError[]> {
     const errors: ProcessingError[] = [];
-    
+
     for (const task of tasks) {
       if (this.options.verbose) {
         console.log(`📋 Pattern: ${task.pattern}`);
@@ -94,15 +97,15 @@ export class FileProcessor {
         if (result.stderr) {
           console.error(`   Stderr: ${result.stderr}`);
         }
-        
+
         errors.push({
           command: task.command,
           stderr: result.stderr,
           stdout: result.stdout,
           exitCode: result.code,
-          pattern: task.pattern
+          pattern: task.pattern,
         });
-        
+
         if (process.env['CLAUDE_ON_EDIT_FAIL_ON_ERROR'] === 'true') {
           throw new Error(`Command failed: ${task.command}`);
         }
@@ -110,11 +113,14 @@ export class FileProcessor {
         console.log(`✅ Command succeeded: ${task.command}`);
       }
     }
-    
+
     return errors;
   }
 
-  private async runConcurrent(tasks: ProcessingTask[], workingDir: string): Promise<ProcessingError[]> {
+  private async runConcurrent(
+    tasks: ProcessingTask[],
+    workingDir: string,
+  ): Promise<ProcessingError[]> {
     const results = await Promise.all(
       tasks.map(async (task) => {
         if (this.options.verbose) {
@@ -131,7 +137,7 @@ export class FileProcessor {
     );
 
     const errors: ProcessingError[] = [];
-    
+
     for (const { task, result } of results) {
       if (!result.success) {
         console.error(`❌ Command failed: ${task.command}`);
@@ -141,15 +147,15 @@ export class FileProcessor {
         if (result.stderr) {
           console.error(`   Stderr: ${result.stderr}`);
         }
-        
+
         errors.push({
           command: task.command,
           stderr: result.stderr,
           stdout: result.stdout,
           exitCode: result.code,
-          pattern: task.pattern
+          pattern: task.pattern,
         });
-        
+
         if (process.env['CLAUDE_ON_EDIT_FAIL_ON_ERROR'] === 'true') {
           throw new Error(`Command failed: ${task.command}`);
         }
@@ -157,7 +163,7 @@ export class FileProcessor {
         console.log(`✅ Command succeeded: ${task.command}`);
       }
     }
-    
+
     return errors;
   }
 }

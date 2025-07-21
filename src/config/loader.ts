@@ -3,7 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { Config, ConfigLoaderOptions } from '../types.js';
 
-const CONFIG_FILE_NAME = 'claude-on-edit.config.js';
+const CONFIG_FILE_NAME = '.claude/claude-on-edit.config.js';
 const PACKAGE_JSON = 'package.json';
 
 export async function loadConfig(

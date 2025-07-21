@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { createReadlineInterface } from './utils/readline.js';
 
-const CONFIG_FILE_NAME = 'claude-on-edit.config.js';
+const CONFIG_FILE_NAME = '.claude/claude-on-edit.config.js';
 
 const CONFIG_TEMPLATE = `export default {
   // Format TypeScript/JavaScript files with Prettier
@@ -36,11 +36,12 @@ const CONFIG_TEMPLATE = `export default {
 
 export async function initConfig(): Promise<void> {
   const configPath = path.resolve(process.cwd(), CONFIG_FILE_NAME);
+  const configDir = path.dirname(configPath);
 
   try {
     await fs.access(configPath);
     console.log(`Configuration file already exists: ${configPath}`);
-    
+
     const rl = createReadlineInterface();
     const answer = await new Promise<string>((resolve) => {
       rl.question('Do you want to overwrite it? (y/N): ', resolve);
@@ -56,6 +57,7 @@ export async function initConfig(): Promise<void> {
   }
 
   try {
+    await fs.mkdir(configDir, { recursive: true });
     await fs.writeFile(configPath, CONFIG_TEMPLATE, 'utf-8');
     console.log(`✅ Configuration file created: ${configPath}`);
     console.log('\nNext steps:');
@@ -63,7 +65,10 @@ export async function initConfig(): Promise<void> {
     console.log('2. Add the post-tool-use hook to your Claude Code settings');
     console.log('3. Run `npx @aki77/claude-on-edit --help` for integration instructions');
   } catch (error) {
-    console.error('Failed to create configuration file:', error instanceof Error ? error.message : String(error));
+    console.error(
+      'Failed to create configuration file:',
+      error instanceof Error ? error.message : String(error),
+    );
     process.exit(1);
   }
 }

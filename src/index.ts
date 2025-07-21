@@ -1,6 +1,6 @@
 import { loadConfig } from './config/loader.js';
 import { FileProcessor } from './processor.js';
-import type { ClaudeOnEditOptions, PostToolUseInput, HookErrorOutput } from './types.js';
+import type { ClaudeOnEditOptions, HookErrorOutput, PostToolUseInput } from './types.js';
 
 export async function postToolUseHook(input: PostToolUseInput): Promise<void> {
   const { cwd, tool_input, tool_response, tool_name } = input;
@@ -37,30 +37,33 @@ export async function postToolUseHook(input: PostToolUseInput): Promise<void> {
 
     console.log(`🎨 Processing file: ${filePath}`);
     const errors = await processor.processFile(filePath, cwd);
-    
+
     if (errors.length > 0) {
       const errorOutput: HookErrorOutput = {
         decision: 'block',
-        reason: `Command failed: ${errors.map(e => e.command).join(', ')}`,
-        details: errors.length === 1 ? {
-          command: errors[0]!.command,
-          stderr: errors[0]!.stderr,
-          stdout: errors[0]!.stdout,
-          exitCode: errors[0]!.exitCode
-        } : undefined
+        reason: `Command failed: ${errors.map((e) => e.command).join(', ')}`,
+        details:
+          errors.length === 1
+            ? {
+                command: errors[0]!.command,
+                stderr: errors[0]!.stderr,
+                stdout: errors[0]!.stdout,
+                exitCode: errors[0]!.exitCode,
+              }
+            : undefined,
       };
-      
+
       console.error(JSON.stringify(errorOutput, null, 2));
       process.exit(2);
     }
-    
+
     console.log('✅ Processing completed');
   } catch (error) {
     const errorOutput: HookErrorOutput = {
       decision: 'block',
-      reason: `Processing failed: ${error instanceof Error ? error.message : String(error)}`
+      reason: `Processing failed: ${error instanceof Error ? error.message : String(error)}`,
     };
-    
+
     console.error(JSON.stringify(errorOutput, null, 2));
     process.exit(2);
   }

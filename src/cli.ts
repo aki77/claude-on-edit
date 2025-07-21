@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { postToolUseHook } from './index.js';
-import type { PostToolUseInput } from './types.js';
 import { initConfig } from './init.js';
+import type { PostToolUseInput } from './types.js';
 
 function showHelp() {
   console.log(`
@@ -19,7 +19,7 @@ HOOK USAGE:
   When used as a post-tool-use hook, the tool accepts JSON input via stdin or as an argument.
 
 CONFIGURATION:
-  Create a claude-on-edit.config.js file in your project root:
+  Create a .claude/claude-on-edit.config.js file in your project:
 
   export default {
     // Format TypeScript/JavaScript files

@@ -31,7 +31,7 @@ Run the init command to create a configuration template:
 npx @aki77/claude-on-edit init
 ```
 
-This will create a `claude-on-edit.config.js` file in your project root with common configuration examples.
+This will create a `.claude/claude-on-edit.config.js` file in your project with common configuration examples.
 
 ### 2. Get Help
 
@@ -43,7 +43,7 @@ npx @aki77/claude-on-edit --help
 
 ## Configuration
 
-Create a `claude-on-edit.config.js` file in your project root:
+Create a `.claude/claude-on-edit.config.js` file in your project:
 
 ```javascript
 export default {
