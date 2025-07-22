@@ -4,6 +4,7 @@ import { createReadlineInterface } from './utils/readline.js';
 
 interface PackageJson {
   'lint-staged'?: Record<string, string | string[]>;
+  type?: string;
 }
 
 interface SettingsJson {
@@ -19,7 +20,6 @@ interface SettingsJson {
   [key: string]: unknown;
 }
 
-const CONFIG_FILE_NAME = '.claude/claude-on-edit.config.js';
 const SETTINGS_FILE_NAME = '.claude/settings.json';
 
 const CONFIG_TEMPLATE = `export default {
@@ -126,7 +126,12 @@ async function writeSettingsJson(settings: SettingsJson): Promise<void> {
 }
 
 export async function initConfig(): Promise<void> {
-  const configPath = path.resolve(process.cwd(), CONFIG_FILE_NAME);
+  // Check package.json for "type" field to determine file extension
+  const packageJson = await readPackageJson();
+  const isESModule = packageJson?.type === 'module';
+  const configExtension = isESModule ? '.js' : '.mjs';
+  const configFileName = `.claude/claude-on-edit.config${configExtension}`;
+  const configPath = path.resolve(process.cwd(), configFileName);
   const configDir = path.dirname(configPath);
 
   try {
@@ -148,7 +153,6 @@ export async function initConfig(): Promise<void> {
   }
 
   // Check for lint-staged configuration in package.json
-  const packageJson = await readPackageJson();
   let configContent = CONFIG_TEMPLATE;
   let usingLintStaged = false;
 
@@ -161,6 +165,10 @@ export async function initConfig(): Promise<void> {
     await fs.mkdir(configDir, { recursive: true });
     await fs.writeFile(configPath, configContent, 'utf-8');
     console.log(`✅ Configuration file created: ${configPath}`);
+    
+    if (!isESModule) {
+      console.log('📝 Created .mjs file (package.json does not have "type": "module")');
+    }
 
     if (usingLintStaged) {
       console.log('📦 Found existing lint-staged configuration in package.json');
