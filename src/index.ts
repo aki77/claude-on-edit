@@ -5,7 +5,13 @@ import type { ClaudeOnEditOptions, HookErrorOutput, PostToolUseInput } from './t
 export async function postToolUseHook(input: PostToolUseInput): Promise<void> {
   const { cwd, tool_input, tool_response, tool_name } = input;
 
-  if (!tool_response?.['success']) {
+  // Check if the tool response indicates success
+  // Support both 'success: true' and 'type: "update"' patterns
+  const isSuccess = tool_response?.['success'] === true || 
+                    tool_response?.['type'] === 'update' ||
+                    tool_response?.['filePath'] !== undefined;
+  
+  if (!isSuccess) {
     return;
   }
 

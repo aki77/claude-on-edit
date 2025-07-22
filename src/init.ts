@@ -165,7 +165,7 @@ export async function initConfig(): Promise<void> {
     await fs.mkdir(configDir, { recursive: true });
     await fs.writeFile(configPath, configContent, 'utf-8');
     console.log(`✅ Configuration file created: ${configPath}`);
-    
+
     if (!isESModule) {
       console.log('📝 Created .mjs file (package.json does not have "type": "module")');
     }
