@@ -58,10 +58,10 @@ export interface CommandResult {
 export interface ProcessingTask {
   pattern: string;
   command: string;
-  files: string[];
+  file: string;
 }
 
-export type CommandFunction = (files: string[]) => string | string[];
+export type CommandFunction = (file: string) => string | string[];
 
 export type CommandConfig = string | string[] | CommandFunction;
 

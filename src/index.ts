@@ -7,10 +7,11 @@ export async function postToolUseHook(input: PostToolUseInput): Promise<void> {
 
   // Check if the tool response indicates success
   // Support both 'success: true' and 'type: "update"' patterns
-  const isSuccess = tool_response?.['success'] === true || 
-                    tool_response?.['type'] === 'update' ||
-                    tool_response?.['filePath'] !== undefined;
-  
+  const isSuccess =
+    tool_response?.['success'] === true ||
+    tool_response?.['type'] === 'update' ||
+    tool_response?.['filePath'] !== undefined;
+
   if (!isSuccess) {
     return;
   }

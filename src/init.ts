@@ -41,8 +41,8 @@ const CONFIG_TEMPLATE = `export default {
     "htmlhint"
   ],
 
-  // Dynamic command example: validate JSON files individually
-  "**/*.json": (files) => files.map(file => \`jsonlint \${file}\`),
+  // Dynamic command example: validate JSON file
+  "**/*.json": (file) => \`jsonlint \${file}\`,
 
   // Run tests for test files
   "**/*.test.{ts,js}": "npm test -- --findRelatedTests --passWithNoTests",

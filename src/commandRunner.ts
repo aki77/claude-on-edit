@@ -19,12 +19,8 @@ export class CommandRunner {
     };
   }
 
-  async executeCommand(
-    command: string,
-    files: string[],
-    workingDir: string,
-  ): Promise<CommandResult> {
-    const fullCommand = this.interpolateFiles(command, files);
+  async executeCommand(command: string, file: string, workingDir: string): Promise<CommandResult> {
+    const fullCommand = this.interpolateFile(command, file);
 
     if (this.options.verbose) {
       console.log(`🔧 Executing: ${fullCommand}`);
@@ -69,11 +65,11 @@ export class CommandRunner {
     }
   }
 
-  private interpolateFiles(command: string, files: string[]): string {
-    if (command.includes('{files}')) {
-      return command.replace('{files}', files.join(' '));
+  private interpolateFile(command: string, file: string): string {
+    if (command.includes('{file}')) {
+      return command.replace('{file}', file);
     }
-    return `${command} ${files.join(' ')}`;
+    return `${command} ${file}`;
   }
 
   private parseCommand(command: string): string[] {

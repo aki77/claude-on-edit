@@ -61,7 +61,7 @@ export default {
   "src/**/*.ts": ["npm run lint", "npm run typecheck"],
 
   // Dynamic commands using functions
-  "**/*.json": (files) => files.map(file => `jsonlint ${file}`),
+  "**/*.json": (file) => `jsonlint ${file}`,
 
   // Multiple commands for Python files
   "**/*.py": [
@@ -130,7 +130,19 @@ If you need to manually configure the PostToolUse hook, add the following to you
 
 ## Configuration Options
 
-The configuration file supports three types of command definitions:
+The configuration file supports three types of command definitions.
+
+### File Placeholder
+
+You can use `{file}` placeholder in your commands, which will be replaced with the actual file path:
+
+```javascript
+export default {
+  "**/*.ts": "eslint {file} --fix"
+};
+```
+
+If the placeholder is not used, the file path will be appended to the command automatically.
 
 ### 1. Simple String Commands
 
@@ -156,8 +168,8 @@ export default {
 
 ```javascript
 export default {
-  "**/*.css": (files) => files.map(file => `stylelint --fix ${file}`),
-  "**/*.md": (files) => `markdownlint ${files.join(' ')}`
+  "**/*.css": (file) => `stylelint --fix ${file}`,
+  "**/*.md": (file) => `markdownlint ${file}`
 };
 ```
 
@@ -220,8 +232,8 @@ export default {
     "tsc --noEmit",
     "jest --findRelatedTests --passWithNoTests"
   ],
-  "**/*.json": (files) => [
-    ...files.map(file => `jsonlint ${file}`),
+  "**/*.json": (file) => [
+    `jsonlint ${file}`,
     "npm run validate-schema"
   ]
 };

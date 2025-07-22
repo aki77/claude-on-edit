@@ -14,7 +14,7 @@ export class FileProcessor {
   }
 
   async processFile(filePath: string, workingDir: string): Promise<ProcessingError[]> {
-    const tasks = this.createTasks([filePath], workingDir);
+    const tasks = this.createTasks(filePath, workingDir);
 
     if (tasks.length === 0) {
       if (this.options.verbose) {
@@ -30,53 +30,32 @@ export class FileProcessor {
     }
   }
 
-  async processFiles(files: string[], workingDir: string): Promise<ProcessingError[]> {
-    const tasks = this.createTasks(files, workingDir);
-
-    if (tasks.length === 0) {
-      if (this.options.verbose) {
-        console.log('No matching patterns for any files');
-      }
-      return [];
-    }
-
-    if (this.options.concurrent) {
-      return await this.runConcurrent(tasks, workingDir);
-    } else {
-      return await this.runSequential(tasks, workingDir);
-    }
-  }
-
-  private createTasks(files: string[], workingDir?: string): ProcessingTask[] {
+  private createTasks(file: string, workingDir?: string): ProcessingTask[] {
     const tasks: ProcessingTask[] = [];
 
     for (const [pattern, commands] of Object.entries(this.config)) {
       if (typeof pattern !== 'string') continue;
 
-      const matchedFiles = files.filter((file) => {
-        // Convert absolute path to relative path if workingDir is provided
-        const pathToMatch = workingDir && file.startsWith('/') ? relative(workingDir, file) : file;
+      // Convert absolute path to relative path if workingDir is provided
+      const pathToMatch = workingDir && file.startsWith('/') ? relative(workingDir, file) : file;
 
-        return minimatch(pathToMatch, pattern, { dot: true });
-      });
+      if (!minimatch(pathToMatch, pattern, { dot: true })) continue;
 
-      if (matchedFiles.length === 0) continue;
-
-      const commandList = this.normalizeCommands(commands, matchedFiles);
+      const commandList = this.normalizeCommands(commands, file);
 
       for (const command of commandList) {
-        tasks.push({ pattern, command, files: matchedFiles });
+        tasks.push({ pattern, command, file });
       }
     }
 
     return tasks;
   }
 
-  private normalizeCommands(commands: unknown, files: string[]): string[] {
+  private normalizeCommands(commands: unknown, file: string): string[] {
     if (typeof commands === 'string') return [commands];
     if (Array.isArray(commands)) return commands as string[];
     if (typeof commands === 'function') {
-      const result = commands(files);
+      const result = commands(file);
       return Array.isArray(result) ? result : [result];
     }
     throw new Error(`Invalid command configuration: ${typeof commands}`);
@@ -93,7 +72,7 @@ export class FileProcessor {
         console.log(`📋 Pattern: ${task.pattern}`);
       }
 
-      const result = await this.commandRunner.executeCommand(task.command, task.files, workingDir);
+      const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir);
 
       if (!result.success) {
         console.error(`❌ Command failed: ${task.command}`);
@@ -133,11 +112,7 @@ export class FileProcessor {
           console.log(`📋 Pattern: ${task.pattern}`);
         }
 
-        const result = await this.commandRunner.executeCommand(
-          task.command,
-          task.files,
-          workingDir,
-        );
+        const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir);
         return { task, result };
       }),
     );
