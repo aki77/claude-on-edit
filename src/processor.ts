@@ -1,5 +1,5 @@
 import { relative } from 'node:path';
-import { minimatch } from 'minimatch';
+import micromatch from 'micromatch';
 import { CommandRunner } from './commandRunner.js';
 import type { ClaudeOnEditOptions, Config, ProcessingError, ProcessingTask } from './types.js';
 
@@ -39,7 +39,7 @@ export class FileProcessor {
       // Convert absolute path to relative path if workingDir is provided
       const pathToMatch = workingDir && file.startsWith('/') ? relative(workingDir, file) : file;
 
-      if (!minimatch(pathToMatch, pattern, { dot: true })) continue;
+      if (!micromatch.isMatch(pathToMatch, pattern, { dot: true })) continue;
 
       const commandList = this.normalizeCommands(commands, file);
 
@@ -75,12 +75,12 @@ export class FileProcessor {
       const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir);
 
       if (!result.success) {
-        console.error(`❌ Command failed: ${task.command}`);
+        console.log(`❌ Command failed: ${task.command}`);
         if (result.error) {
-          console.error(`   Error: ${result.error}`);
+          console.log(`   Error: ${result.error}`);
         }
         if (result.stderr) {
-          console.error(`   Stderr: ${result.stderr}`);
+          console.log(`   Stderr: ${result.stderr}`);
         }
 
         errors.push({
@@ -121,12 +121,12 @@ export class FileProcessor {
 
     for (const { task, result } of results) {
       if (!result.success) {
-        console.error(`❌ Command failed: ${task.command}`);
+        console.log(`❌ Command failed: ${task.command}`);
         if (result.error) {
-          console.error(`   Error: ${result.error}`);
+          console.log(`   Error: ${result.error}`);
         }
         if (result.stderr) {
-          console.error(`   Stderr: ${result.stderr}`);
+          console.log(`   Stderr: ${result.stderr}`);
         }
 
         errors.push({
