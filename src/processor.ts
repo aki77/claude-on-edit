@@ -1,4 +1,5 @@
 import { minimatch } from 'minimatch';
+import { relative } from 'node:path';
 import { CommandRunner } from './commandRunner.js';
 import type { ClaudeOnEditOptions, Config, ProcessingError, ProcessingTask } from './types.js';
 
@@ -13,7 +14,7 @@ export class FileProcessor {
   }
 
   async processFile(filePath: string, workingDir: string): Promise<ProcessingError[]> {
-    const tasks = this.createTasks([filePath]);
+    const tasks = this.createTasks([filePath], workingDir);
 
     if (tasks.length === 0) {
       if (this.options.verbose) {
@@ -30,7 +31,7 @@ export class FileProcessor {
   }
 
   async processFiles(files: string[], workingDir: string): Promise<ProcessingError[]> {
-    const tasks = this.createTasks(files);
+    const tasks = this.createTasks(files, workingDir);
 
     if (tasks.length === 0) {
       if (this.options.verbose) {
@@ -46,13 +47,20 @@ export class FileProcessor {
     }
   }
 
-  private createTasks(files: string[]): ProcessingTask[] {
+  private createTasks(files: string[], workingDir?: string): ProcessingTask[] {
     const tasks: ProcessingTask[] = [];
 
     for (const [pattern, commands] of Object.entries(this.config)) {
       if (typeof pattern !== 'string') continue;
 
-      const matchedFiles = files.filter((file) => minimatch(file, pattern, { dot: true }));
+      const matchedFiles = files.filter((file) => {
+        // Convert absolute path to relative path if workingDir is provided
+        const pathToMatch = workingDir && file.startsWith('/') 
+          ? relative(workingDir, file) 
+          : file;
+        
+        return minimatch(pathToMatch, pattern, { dot: true });
+      });
 
       if (matchedFiles.length === 0) continue;
 
