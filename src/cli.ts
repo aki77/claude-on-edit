@@ -19,7 +19,7 @@ HOOK USAGE:
   When used as a post-tool-use hook, the tool accepts JSON input via stdin or as an argument.
 
 CONFIGURATION:
-  Create a .claude/claude-on-edit.config.js file in your project:
+  Create a .claude/claude-on-edit.config.js or .claude/claude-on-edit.config.mjs file in your project:
 
   export default {
     // Format TypeScript/JavaScript files

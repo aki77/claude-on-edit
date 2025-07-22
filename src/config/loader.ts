@@ -3,7 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { Config, ConfigLoaderOptions } from '../types.js';
 
-const CONFIG_FILE_NAME = '.claude/claude-on-edit.config.js';
+const CONFIG_FILE_NAMES = ['.claude/claude-on-edit.config.js', '.claude/claude-on-edit.config.mjs'];
 const PACKAGE_JSON = 'package.json';
 
 export async function loadConfig(
@@ -12,10 +12,12 @@ export async function loadConfig(
 ): Promise<Config | null> {
   const searchDir = options.cwd || cwd;
 
-  const configPath = path.join(searchDir, CONFIG_FILE_NAME);
-  const configFromFile = await loadConfigFile(configPath);
-  if (configFromFile) {
-    return configFromFile;
+  for (const fileName of CONFIG_FILE_NAMES) {
+    const configPath = path.join(searchDir, fileName);
+    const configFromFile = await loadConfigFile(configPath);
+    if (configFromFile) {
+      return configFromFile;
+    }
   }
 
   const packageJsonPath = path.join(searchDir, PACKAGE_JSON);

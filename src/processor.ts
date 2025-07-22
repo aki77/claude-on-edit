@@ -1,5 +1,5 @@
-import { minimatch } from 'minimatch';
 import { relative } from 'node:path';
+import { minimatch } from 'minimatch';
 import { CommandRunner } from './commandRunner.js';
 import type { ClaudeOnEditOptions, Config, ProcessingError, ProcessingTask } from './types.js';
 
@@ -55,10 +55,8 @@ export class FileProcessor {
 
       const matchedFiles = files.filter((file) => {
         // Convert absolute path to relative path if workingDir is provided
-        const pathToMatch = workingDir && file.startsWith('/') 
-          ? relative(workingDir, file) 
-          : file;
-        
+        const pathToMatch = workingDir && file.startsWith('/') ? relative(workingDir, file) : file;
+
         return minimatch(pathToMatch, pattern, { dot: true });
       });
 
