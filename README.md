@@ -8,6 +8,9 @@ A post-tool-use hook for Claude Code that automatically runs commands on files w
 
 ## Features
 
+- 🚀 **One-command setup**: `init` command automatically configures everything
+- 📦 **lint-staged migration**: Automatically detects and converts existing lint-staged configuration
+- 🔧 **Claude Code integration**: Automatically sets up PostToolUse hooks in settings.json
 - 🎯 **Pattern-based configuration**: Define commands for specific file patterns using glob syntax
 - 🚀 **Multiple execution modes**: Run commands concurrently or sequentially
 - 📝 **Comprehensive logging**: Verbose output for debugging and monitoring
@@ -23,15 +26,19 @@ npm install -g @aki77/claude-on-edit
 
 ## Quick Start
 
-### 1. Create Configuration File
+### 1. Initialize Configuration
 
-Run the init command to create a configuration template:
+Run the init command to set up everything automatically:
 
 ```bash
 npx @aki77/claude-on-edit init
 ```
 
-This will create a `.claude/claude-on-edit.config.js` file in your project with common configuration examples.
+This will:
+- Create a `.claude/claude-on-edit.config.js` configuration file
+- Automatically detect and migrate existing `lint-staged` configuration from `package.json`
+- Set up Claude Code hooks in `.claude/settings.json`
+- Configure the PostToolUse hook to run automatically on file edits
 
 ### 2. Get Help
 
@@ -79,26 +86,36 @@ npx @aki77/claude-on-edit -h
 
 ### Init Command
 
-Create a configuration file template:
+Create a configuration file template and set up Claude Code hooks:
 
 ```bash
 npx @aki77/claude-on-edit init
 ```
 
+The init command will:
+- Create `.claude/claude-on-edit.config.js` with a comprehensive configuration template
+- Detect existing `lint-staged` configuration in `package.json` and migrate it automatically
+- Set up `.claude/settings.json` with the appropriate PostToolUse hook configuration
+- Handle existing settings by merging rather than overwriting
+
 If a configuration file already exists, you'll be prompted to confirm overwriting it.
 
 ## Usage
 
-### As a Post-Tool-Use Hook
+### Automatic Setup (Recommended)
 
-Add the following to your Claude Code settings:
+After running `npx @aki77/claude-on-edit init`, the tool is automatically configured and ready to use. No manual setup required!
+
+### Manual Setup (Advanced)
+
+If you need to manually configure the PostToolUse hook, add the following to your Claude Code settings (`.claude/settings.json`):
 
 ```json
 {
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit",
+        "matcher": "(Write|Edit|MultiEdit)",
         "hooks": [
           {
             "type": "command",
