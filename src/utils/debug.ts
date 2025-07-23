@@ -13,7 +13,7 @@ export function debug(message: string, data?: any): void {
   if (process.env['CLAUDE_ON_EDIT_DEBUG'] !== 'true') {
     return;
   }
-  
+
   if (data !== undefined) {
     console.log(`[DEBUG] ${message}`, data);
   } else {

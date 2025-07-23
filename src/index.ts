@@ -7,7 +7,7 @@ export async function postToolUseHook(input: PostToolUseInput): Promise<void> {
   const { cwd, tool_input, tool_response, tool_name } = input;
 
   // Small delay to ensure file system sync
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
   // Debug logging
   debug('postToolUseHook called at:', new Date().toISOString());
@@ -63,7 +63,7 @@ export async function postToolUseHook(input: PostToolUseInput): Promise<void> {
     const startTime = Date.now();
     // Use stdout for normal processing messages
     console.log(`🎨 Processing file: ${filePath} at ${new Date(startTime).toISOString()}`);
-    
+
     // Read file content before processing for debugging
     if (process.env['CLAUDE_ON_EDIT_DEBUG'] === 'true') {
       try {
