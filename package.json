@@ -1,6 +1,6 @@
 {
   "name": "@aki77/claude-on-edit",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Run commands on files when Claude Code edits them",
   "keywords": [
     "claude",
