@@ -73,7 +73,12 @@ export class FileProcessor {
         console.log(`📋 Pattern: ${task.pattern}`);
       }
 
-      const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir, task.isFunctionGenerated);
+      const result = await this.commandRunner.executeCommand(
+        task.command,
+        task.file,
+        workingDir,
+        task.isFunctionGenerated,
+      );
 
       if (!result.success) {
         console.log(`❌ Command failed: ${task.command}`);
@@ -113,7 +118,12 @@ export class FileProcessor {
           console.log(`📋 Pattern: ${task.pattern}`);
         }
 
-        const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir, task.isFunctionGenerated);
+        const result = await this.commandRunner.executeCommand(
+          task.command,
+          task.file,
+          workingDir,
+          task.isFunctionGenerated,
+        );
         return { task, result };
       }),
     );

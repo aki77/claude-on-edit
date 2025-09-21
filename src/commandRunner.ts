@@ -18,7 +18,12 @@ export class CommandRunner {
     };
   }
 
-  async executeCommand(command: string, file: string, workingDir: string, isFunctionGenerated?: boolean): Promise<CommandResult> {
+  async executeCommand(
+    command: string,
+    file: string,
+    workingDir: string,
+    isFunctionGenerated?: boolean,
+  ): Promise<CommandResult> {
     const fullCommand = isFunctionGenerated ? command : this.interpolateFile(command, file);
 
     if (this.options.verbose) {
@@ -36,8 +41,10 @@ export class CommandRunner {
 
     try {
       // Always use shell execution
-      const shellPath = process.platform === 'win32' ? process.env['ComSpec'] || 'cmd.exe' : '/bin/sh';
-      const shellArgs = process.platform === 'win32' ? ['/d', '/s', '/c', fullCommand] : ['-c', fullCommand];
+      const shellPath =
+        process.platform === 'win32' ? process.env['ComSpec'] || 'cmd.exe' : '/bin/sh';
+      const shellArgs =
+        process.platform === 'win32' ? ['/d', '/s', '/c', fullCommand] : ['-c', fullCommand];
       const result = await execFileAsync(shellPath, shellArgs, {
         cwd: workingDir,
         maxBuffer: 1024 * 1024 * 10,
@@ -51,7 +58,12 @@ export class CommandRunner {
       };
     } catch (error: unknown) {
       // Type-safe error handling
-      const errorObj = error as { message?: string; code?: number; stdout?: string; stderr?: string };
+      const errorObj = error as {
+        message?: string;
+        code?: number;
+        stdout?: string;
+        stderr?: string;
+      };
       return {
         success: false,
         error: errorObj.message || 'Unknown error',
