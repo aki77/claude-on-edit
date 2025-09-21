@@ -42,7 +42,6 @@ export interface ClaudeOnEditOptions {
 }
 
 export interface CommandRunnerOptions extends ClaudeOnEditOptions {
-  shell?: boolean;
   stdio?: 'inherit' | 'pipe';
   cwd?: string;
 }
@@ -59,6 +58,7 @@ export interface ProcessingTask {
   pattern: string;
   command: string;
   file: string;
+  isFunctionGenerated?: boolean;
 }
 
 export type CommandFunction = (file: string) => string | string[];

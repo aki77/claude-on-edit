@@ -9,7 +9,6 @@ export class CommandRunner {
 
   constructor(options: CommandRunnerOptions = {}) {
     this.options = {
-      shell: true,
       stdio: 'inherit',
       cwd: process.cwd(),
       verbose: false,
@@ -19,8 +18,8 @@ export class CommandRunner {
     };
   }
 
-  async executeCommand(command: string, file: string, workingDir: string): Promise<CommandResult> {
-    const fullCommand = this.interpolateFile(command, file);
+  async executeCommand(command: string, file: string, workingDir: string, isFunctionGenerated?: boolean): Promise<CommandResult> {
+    const fullCommand = isFunctionGenerated ? command : this.interpolateFile(command, file);
 
     if (this.options.verbose) {
       console.log(`🔧 Executing: ${fullCommand}`);
@@ -36,15 +35,11 @@ export class CommandRunner {
     }
 
     try {
-      const [cmd, ...args] = this.parseCommand(fullCommand);
-
-      if (!cmd) {
-        throw new Error('Empty command');
-      }
-
-      const result = await execFileAsync(cmd, args, {
+      // Always use shell execution
+      const shellPath = process.platform === 'win32' ? process.env['ComSpec'] || 'cmd.exe' : '/bin/sh';
+      const shellArgs = process.platform === 'win32' ? ['/d', '/s', '/c', fullCommand] : ['-c', fullCommand];
+      const result = await execFileAsync(shellPath, shellArgs, {
         cwd: workingDir,
-        shell: this.options.shell,
         maxBuffer: 1024 * 1024 * 10,
         env: process.env,
       });
@@ -54,13 +49,15 @@ export class CommandRunner {
         stdout: result.stdout || '',
         stderr: result.stderr || '',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      // Type-safe error handling
+      const errorObj = error as { message?: string; code?: number; stdout?: string; stderr?: string };
       return {
         success: false,
-        error: error.message,
-        code: error.code,
-        stdout: error.stdout || '',
-        stderr: error.stderr || '',
+        error: errorObj.message || 'Unknown error',
+        code: errorObj.code,
+        stdout: errorObj.stdout || '',
+        stderr: errorObj.stderr || '',
       };
     }
   }
@@ -70,56 +67,5 @@ export class CommandRunner {
       return command.replace('{file}', file);
     }
     return `${command} ${file}`;
-  }
-
-  private parseCommand(command: string): string[] {
-    const parts: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    let quoteChar = '';
-    let escaped = false;
-
-    for (let i = 0; i < command.length; i++) {
-      const char = command[i];
-
-      if (escaped) {
-        current += char;
-        escaped = false;
-        continue;
-      }
-
-      if (char === '\\') {
-        escaped = true;
-        continue;
-      }
-
-      if (!inQuotes && (char === '"' || char === "'")) {
-        inQuotes = true;
-        quoteChar = char;
-        continue;
-      }
-
-      if (inQuotes && char === quoteChar) {
-        inQuotes = false;
-        quoteChar = '';
-        continue;
-      }
-
-      if (!inQuotes && char === ' ') {
-        if (current.length > 0) {
-          parts.push(current);
-          current = '';
-        }
-        continue;
-      }
-
-      current += char;
-    }
-
-    if (current.length > 0) {
-      parts.push(current);
-    }
-
-    return parts;
   }
 }
