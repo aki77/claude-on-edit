@@ -41,10 +41,11 @@ export class FileProcessor {
 
       if (!micromatch.isMatch(pathToMatch, pattern, { dot: true })) continue;
 
+      const isFunctionGenerated = typeof commands === 'function';
       const commandList = this.normalizeCommands(commands, file);
 
       for (const command of commandList) {
-        tasks.push({ pattern, command, file });
+        tasks.push({ pattern, command, file, isFunctionGenerated });
       }
     }
 
@@ -72,7 +73,7 @@ export class FileProcessor {
         console.log(`📋 Pattern: ${task.pattern}`);
       }
 
-      const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir);
+      const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir, task.isFunctionGenerated);
 
       if (!result.success) {
         console.log(`❌ Command failed: ${task.command}`);
@@ -112,7 +113,7 @@ export class FileProcessor {
           console.log(`📋 Pattern: ${task.pattern}`);
         }
 
-        const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir);
+        const result = await this.commandRunner.executeCommand(task.command, task.file, workingDir, task.isFunctionGenerated);
         return { task, result };
       }),
     );
